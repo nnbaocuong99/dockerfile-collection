@@ -1,10 +1,3 @@
-## Runtime usage
-
-- Save the **`RUNTIME`** files with appropriate extensions (e.g., `.py`,`.js`, `.rb`,...)
-- Save the test scripts with appropriate names and extensions and also need to install testing frameworks:
-
-<br>
-
 ## Build
 
 ### Linux
@@ -113,3 +106,10 @@ EXPOSE 80
 >   $ docker build -t your-image-name .
 >   ```
 > - Replace `your-image-name` with the desired name for your Docker image.
+
+<br>
+
+## Runtime usage
+
+- Save the **`RUNTIME`** files with appropriate extensions (e.g., `.py`,`.js`, `.rb`,...)
+- Save the test scripts with appropriate names and extensions and also need to install testing frameworks:
