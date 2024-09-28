@@ -1,0 +1,67 @@
+module test_module
+    implicit none
+    private
+    public :: run_tests
+contains
+    subroutine assert_equal(expected, actual, test_name)
+        class(*), intent(in) :: expected, actual
+        character(len=*), intent(in) :: test_name
+        
+        select type (expected)
+            type is (integer)
+                select type (actual)
+                    type is (integer)
+                        if (expected /= actual) then
+                            print *, "Test '", trim(test_name), "' failed: Expected ", expected, ", but got ", actual
+                        else
+                            print *, "Test '", trim(test_name), "' passed"
+                        end if
+                end select
+            type is (character(*))
+                select type (actual)
+                    type is (character(*))
+                        if (expected /= actual) then
+                            print *, "Test '", trim(test_name), "' failed: Expected '", trim(expected), "', but got '", trim(actual), "'"
+                        else
+                            print *, "Test '", trim(test_name), "' passed"
+                        end if
+                end select
+        end select
+    end subroutine assert_equal
+    
+    subroutine test_addition()
+        call assert_equal(4, 2 + 2, "addition")
+    end subroutine test_addition
+    
+    subroutine test_string_concatenation()
+        character(len=13) :: result
+        result = "Hello, " // "World!"
+        call assert_equal("Hello, World!", result, "string concatenation")
+    end subroutine test_string_concatenation
+    
+    subroutine run_tests()
+        integer :: passed, failed
+        
+        print *, "Running Fortran tests..."
+        
+        passed = 0
+        failed = 0
+        
+        call test_addition()
+        call test_string_concatenation()
+        
+        print *, "Tests run: ", passed + failed
+        print *, "Tests passed: ", passed
+        print *, "Tests failed: ", failed
+    end subroutine run_tests
+end module test_module
+
+program testscript
+    use test_module
+    implicit none
+    
+    call run_tests()
+end program testscript
+
+! To compile: gfortran -o testscript testscript.f90
+! To run: ./testscript

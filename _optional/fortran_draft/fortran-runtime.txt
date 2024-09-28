@@ -1,0 +1,39 @@
+program runtime
+    use, intrinsic :: iso_fortran_env, only: compiler_version, compiler_options
+    implicit none
+    
+    integer :: start_time, end_time, count_rate
+    
+    print *, "Fortran Runtime Environment"
+    print *, "Fortran version: ", compiler_version()
+    print *, "Compiler options: ", compiler_options()
+    
+    call getcwd(cwd)
+    print *, "Current working directory: ", trim(cwd)
+    
+    call system_clock(start_time, count_rate)
+    
+    ! Add your application logic here
+    ! For example:
+    ! call start_app()
+    
+    call system_clock(end_time)
+    print *, "Execution time: ", real(end_time - start_time) / real(count_rate), " seconds"
+
+contains
+    subroutine getcwd(cwd)
+        character(len=:), allocatable, intent(out) :: cwd
+        integer :: length, stat
+        
+        call get_environment_variable("PWD", length=length, status=stat)
+        if (stat == 0) then
+            allocate(character(len=length) :: cwd)
+            call get_environment_variable("PWD", value=cwd, status=stat)
+        else
+            cwd = "Unable to determine current directory"
+        end if
+    end subroutine getcwd
+end program runtime
+
+! To compile: gfortran -o runtime runtime.f90
+! To run: ./runtime

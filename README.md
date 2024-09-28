@@ -103,6 +103,8 @@ EXPOSE 80
 # CMD ["custom-command"]
 ```
 
+<br>
+
 > [!warning]
 > ### Key points
 > - **Ubuntu and macOS** both are based on the official Ubuntu image since Docker containers for macOS are built on top of Linux VMs.
