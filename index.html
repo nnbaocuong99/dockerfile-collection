@@ -40,6 +40,21 @@
         select {
             padding: 0.5rem;
             font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        /* Animation for dropdown */
+        select:focus {
+            transform: scale(1.05); /* Slightly enlarge on focus */
+            background-color: #f8f9fa; /* Subtle color change on focus */
+        }
+        select option {
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+        select:focus option {
+            opacity: 1;
+            transform: translateY(0);
         }
         footer {
             background-color: #f0f0f0;
@@ -55,7 +70,7 @@
     </header>
     <main>
         <select>
-            <option value="">Select a developer language</option>
+            <option value="">Select a language</option>
             <option value="javascript">JavaScript</option>
             <option value="python">Python</option>
             <option value="java">Java</option>
@@ -68,3 +83,4 @@
     </footer>
 </body>
 </html>
+
