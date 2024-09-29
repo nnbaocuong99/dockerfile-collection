@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dockerfile Template</title>
+    <title>Dockerfile Generator</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/languages/dockerfile.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -12,27 +15,36 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
+            background-color: #f0f0f0;
+            transition: background-color 0.5s ease;
         }
         header {
-            background-color: #f0f0f0;
+            background-color: #007bff;
             padding: 1rem;
             display: flex;
             justify-content: flex-start;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .button {
             margin-right: 1rem;
             padding: 0.5rem 1rem;
-            background-color: #007bff;
-            color: white;
+            background-color: #ffffff;
+            color: #007bff;
             border: none;
             cursor: pointer;
             text-decoration: none;
             border-radius: 15px;
             font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            background-color: #e0e0e0;
+            transform: translateY(-2px);
         }
         main {
             flex-grow: 1;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             padding: 2rem;
@@ -40,26 +52,57 @@
         select {
             padding: 0.5rem;
             font-size: 1rem;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            border: 2px solid #007bff;
             transition: all 0.3s ease;
         }
-        /* Animation for dropdown */
         select:focus {
-            transform: scale(1.05); /* Slightly enlarge on focus */
-            background-color: #f8f9fa; /* Subtle color change on focus */
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(0,123,255,0.3);
         }
-        select option {
-            opacity: 0;
-            transform: translateY(-10px);
-            transition: all 0.3s ease;
+        #dockerfile-container {
+            width: 80%;
+            max-width: 600px;
+            margin-top: 1rem;
+            display: none;
         }
-        select:focus option {
-            opacity: 1;
-            transform: translateY(0);
+        #dockerfile {
+            border: 1px solid #ccc;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        #dockerfile pre {
+            margin: 0;
+            padding: 1rem;
+        }
+        #copy-button {
+            display: block;
+            margin: 1rem auto;
+            padding: 0.5rem 1rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        #copy-button:hover {
+            background-color: #0056b3;
         }
         footer {
-            background-color: #f0f0f0;
+            background-color: #007bff;
+            color: white;
             padding: 1rem;
             text-align: center;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
         }
     </style>
 </head>
@@ -69,18 +112,74 @@
         <button class="button">About the website</button>
     </header>
     <main>
-        <select>
-            <option value="">Select a language</option>
+        <select id="languageSelect">
+            <option value="">Select a developer language</option>
             <option value="javascript">JavaScript</option>
             <option value="python">Python</option>
             <option value="java">Java</option>
             <option value="csharp">C#</option>
             <option value="cpp">C++</option>
         </select>
+        <div id="dockerfile-container">
+            <div id="dockerfile"><pre><code class="dockerfile"></code></pre></div>
+            <button id="copy-button">Copy Dockerfile</button>
+        </div>
     </main>
     <footer>
         <p>&copy; 2024 nnbaocuong99.</p>
     </footer>
+
+    <script>
+        const languageSelect = document.getElementById('languageSelect');
+        const dockerfileContainer = document.getElementById('dockerfile-container');
+        const dockerfile = document.getElementById('dockerfile');
+        const dockerfileCode = dockerfile.querySelector('code');
+        const copyButton = document.getElementById('copy-button');
+        const body = document.body;
+
+        const repoUrl = 'https://api.github.com/repos/nnbaocuong99nnbaocuong99/dockerfile-collection/';
+
+        async function fetchDockerfile(language) {
+            try {
+                const response = await fetch(`${repoUrl}/${language}.dockerfile`);
+                const data = await response.json();
+                return atob(data.content);
+            } catch (error) {
+                console.error('Error fetching Dockerfile:', error);
+                return 'Error: Unable to fetch Dockerfile';
+            }
+        }
+
+        languageSelect.addEventListener('change', async function() {
+            const selectedLanguage = this.value;
+            if (selectedLanguage) {
+                const dockerfileContent = await fetchDockerfile(selectedLanguage);
+                dockerfileCode.textContent = dockerfileContent;
+                hljs.highlightElement(dockerfileCode);
+                dockerfileContainer.style.display = 'block';
+                dockerfileContainer.classList.remove('fade-in');
+                void dockerfileContainer.offsetWidth; // Trigger reflow
+                dockerfileContainer.classList.add('fade-in');
+                body.style.backgroundColor = '#e0e0e0';
+            } else {
+                dockerfileContainer.style.display = 'none';
+                dockerfileCode.textContent = '';
+                body.style.backgroundColor = '#f0f0f0';
+            }
+        });
+
+        copyButton.addEventListener('click', function() {
+            const range = document.createRange();
+            range.selectNode(dockerfileCode);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            document.execCommand('copy');
+            window.getSelection().removeAllRanges();
+            this.textContent = 'Copied!';
+            setTimeout(() => {
+                this.textContent = 'Copy Dockerfile';
+            }, 2000);
+        });
+    </script>
 </body>
 </html>
-
